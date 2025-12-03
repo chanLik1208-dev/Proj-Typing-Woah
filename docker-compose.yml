@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  # 1. Node.js 應用程式服務 (後端與反作弊邏輯)
+  node-app:
+    # 告訴 Docker Compose 使用當前目錄下的 Dockerfile 來建構這個服務
+    build: .
+    container_name: typing_node_app
+    restart: always
+    # 將您的數據文件和程式碼掛載到容器中，方便開發和持久化數據
+    volumes:
+      # 為了保持排行榜數據持久化
+      - ./scores.json:/app/scores.json 
+      # 為了讓您在本地修改 server.js 時容器能即時更新 (開發用途)
+      # - ./server.js:/app/server.js 
+      # - ./public:/app/public 
+    # 容器內部開放的端口，僅供 Nginx 容器存取
+    expose:
+      - 3000
+
+  # 2. Nginx 反向代理服務
+  nginx-proxy:
+    image: nginx:stable-alpine
+    container_name: typing_nginx_proxy
+    restart: always
+    ports:
+      # 將主機的 80 端口映射到 Nginx 容器的 80 端口 (外部訪問)
+      - "80:80" 
+      # 如果需要 SSL/HTTPS，請映射 443 端口
+      - "443:443" 
+    volumes:
+      # 掛載您自定義的 Nginx 配置檔案，覆蓋容器內部的默認配置
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    # 確保 Nginx 在 Node.js 服務啟動後才啟動
+    depends_on:
+      - node-app
