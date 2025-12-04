@@ -3,4 +3,5 @@
 本人不對任何此項目產生的後果負責
 
 
-~~Code By Gemini 3.5pro and CL~~
+~~Code By Gemini 3.0 Pro and CL~~
+
