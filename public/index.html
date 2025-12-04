@@ -1,739 +1,229 @@
 <!DOCTYPE html>
 <!-- Code With Gemini 3.0 Pro Also CL Prompt -->
-<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>English Typing Competition System</title>
-    <style>
-        :root {
-            --primary-color: #2c3e50;
-            --accent-color: #3498db;
-            --bg-color: #f0f2f5;
-            --text-color: #333;
-            --success-color: #27ae60;
-            --error-color: #c0392b;
-            --warning-color: #f39c12;
-        }
 
-        body {
-            font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
-        }
+    <!-- import css&js-->
+    <script src="index.js"></script>
+    <link rel="stylesheet" href="index.css">
+</head>
 
-        .container {
-            background: white;
-            width: 100%;
-            max-width: 1000px;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        h1, h2 {
-            text-align: center;
-            color: var(--primary-color);
-            margin-bottom: 20px;
-        }
-
-        /* Screen Visibility Control */
-        .screen {
-            display: none;
-            animation: fadeIn 0.5s;
-        }
-
-        .screen.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        /* Form Elements */
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            font-weight: bold;
-            display: block;
-            margin-bottom: 8px;
-        }
-
-        textarea {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-family: "Courier New", Courier, monospace; /* Monospace is better for English typing alignment */
-            resize: vertical;
-            box-sizing: border-box;
-            line-height: 1.6;
-        }
-
-        input[type="text"], input[type="number"] {
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-            width: 100%;
-            box-sizing: border-box;
-            font-size: 1rem;
-        }
-
-        .row {
-            display: flex;
-            gap: 20px;
-        }
-        
-        .col {
-            flex: 1;
-        }
-
-        .btn {
-            background-color: var(--accent-color);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            font-size: 1.1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.3s;
-            display: block;
-            margin: 20px auto 0;
-            width: 100%;
-            max-width: 300px;
-        }
-
-        .btn:hover {
-            background-color: #2980b9;
-        }
-
-        .btn-danger {
-            background-color: var(--error-color);
-        }
-
-        .btn-danger:hover {
-            background-color: #a93226;
-        }
-
-        .btn-secondary {
-            background-color: #95a5a6;
-        }
-
-        /* Game Screen Styles */
-        .game-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #ecf0f1;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-
-        .timer-box {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: var(--error-color);
-            min-width: 100px;
-            text-align: right;
-        }
-
-        .live-stats {
-            display: flex;
-            gap: 20px;
-        }
-
-        .live-stat-item {
-            text-align: center;
-        }
-
-        .live-stat-value {
-            font-size: 1.4rem;
-            font-weight: bold;
-            color: var(--primary-color);
-        }
-
-        .live-stat-label {
-            font-size: 0.8rem;
-            color: #7f8c8d;
-        }
-
-        .text-display-area {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .reference-text {
-            background-color: #fff;
-            border: 1px solid #ddd;
-            padding: 20px;
-            border-radius: 8px;
-            font-size: 1.3rem;
-            line-height: 1.8;
-            user-select: none;
-            height: 200px;
-            overflow-y: auto;
-            border-left: 5px solid var(--accent-color);
-            white-space: pre-wrap;
-            font-family: "Courier New", Courier, monospace;
-            /* Important for English: Break words correctly */
-            word-wrap: break-word; 
-            word-break: normal;
-        }
-
-        /* Real-time Highlighting */
-        .hl-correct { color: var(--success-color); background-color: #e8f8f5; }
-        .hl-wrong { color: white; background-color: var(--error-color); border-radius: 2px; }
-        .hl-current { text-decoration: underline; text-decoration-color: var(--accent-color); text-decoration-thickness: 3px; background-color: #eaf2f8; }
-
-        .input-area textarea {
-            border-color: var(--accent-color);
-            height: 150px;
-        }
-
-        /* Result Screen Styles */
-        .final-score-box {
-            background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            margin-bottom: 30px;
-            box-shadow: 0 5px 15px rgba(243, 156, 18, 0.3);
-        }
-
-        .final-score-value {
-            font-size: 4rem;
-            font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            border: 1px solid #eee;
-        }
-
-        .stat-value { font-size: 2rem; font-weight: bold; color: var(--accent-color); }
-        .stat-label { color: #7f8c8d; margin-top: 5px; font-size: 0.9rem; }
-
-        /* Leaderboard Table */
-        .leaderboard-section {
-            margin-top: 30px;
-            border-top: 2px solid #eee;
-            padding-top: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-
-        th {
-            background-color: #f8f9fa;
-            color: var(--primary-color);
-        }
-
-        tr:nth-child(even) { background-color: #fcfcfc; }
-        
-        .rank-1 { color: #d35400; font-weight: bold; }
-        .rank-2 { color: #7f8c8d; font-weight: bold; }
-        .rank-3 { color: #d35400; font-weight: bold; } 
-
-        /* Anti-cheat warning */
-        .cheat-warning {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background-color: var(--error-color);
-            color: white;
-            text-align: center;
-            padding: 10px;
-            z-index: 10000;
-            font-weight: bold;
-        }
-
-        @media (max-width: 768px) {
-            .game-header { flex-direction: column; gap: 10px; }
-            .live-stats { width: 100%; justify-content: space-around; }
-            .row { flex-direction: column; gap: 10px; }
-        }
-    </style>
-<style>
-        @keyframes fadeInOut {
-            0% { opacity: 0; transform: translateY(-20px); }
-            20% { opacity: 1; transform: translateY(0); }
-            80% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-20px); }
-        }
-    </style></head>
 <body>
 
-<div class="container">
-    <!-- 1. Setup Screen -->
-    <div id="setup-screen" class="screen active">
-        <h1>🏆🏆 English Typing Competition</h1>
-        
-        <div class="row">
-            <div class="col form-group">
-                <label for="student-name">Student Name:</label>
-                <input type="text" id="student-name" placeholder="Enter your full name" required="">
-            </div>
-            <div class="col form-group">
-                <label for="time-limit">Time Limit (Minutes):</label>
-                <input type="number" id="time-limit" value="1" min="1" max="60" disabled="">
-            </div>
-        </div>
+    <div class="container">
+        <!-- 1. Setup Screen -->
+        <div id="setup-screen" class="screen active">
+            <h1>🏆🏆 English Typing Competition</h1>
 
-        <div class="form-group">
-            <label for="article-input">Text to Type:</label>
-            <textarea id="article-input" style="height: 150px;" placeholder="Paste your text here..." readonly="" disabled="">Technology has revolutionized the way we live, work, and communicate. In the digital age, typing is an essential skill that everyone should master. Whether you are writing an email, coding a program, or chatting with friends, speed and accuracy matter. Practice is the key to improvement. Keep your fingers on the home row and try to look at the screen instead of the keyboard.</textarea>
-        </div>
-
-        <button class="btn" onclick="goToGame()">Start Competition</button>
-        
-        <div style="text-align: center; margin-top: 15px;">
-            <a href="window.location.href = window.location.href" onclick="clearLeaderboard()" style="color: #999; font-size: 0.8rem;">Clear Leaderboard History</a>
-        </div>
-    </div>
-
-    <!-- 2. Game Screen -->
-    <div id="game-screen" class="screen">
-        <div class="game-header">
-            <div style="font-weight: bold; font-size: 1.2rem;" id="current-player-name">Player: ---</div>
-            
-            <!-- Feature 1: Real-time Stats -->
-            <div class="live-stats">
-                <div class="live-stat-item">
-                    <div class="live-stat-value" id="live-speed">0</div>
-                    <div class="live-stat-label">WPM</div>
+            <div class="row">
+                <div class="col form-group">
+                    <label for="student-name">Student Name:</label>
+                    <input type="text" id="student-name" placeholder="Enter your full name" required="">
                 </div>
-                <div class="live-stat-item">
-                    <div class="live-stat-value" id="live-accuracy">100%</div>
-                    <div class="live-stat-label">Accuracy</div>
+                <div class="col form-group">
+                    <label for="time-limit">Time Limit (Minutes):</label>
+                    <input type="number" id="time-limit" value="1" min="1" max="60" disabled="">
                 </div>
             </div>
 
-            <div class="timer-box" id="timer-display">00:00</div>
-        </div>
-        
-        <div class="text-display-area">
-            <div>
-                <label>Reference Text:</label>
-                <div class="reference-text" id="game-reference-text"></div>
+            <div class="form-group">
+                <label for="article-input">Text to Type:</label>
+                <textarea id="article-input" style="height: 150px;" placeholder="Paste your text here..." readonly=""
+                    disabled="">Technology has revolutionized the way we live, work, and communicate. In the digital age, typing is an essential skill that everyone should master. Whether you are writing an email, coding a program, or chatting with friends, speed and accuracy matter. Practice is the key to improvement. Keep your fingers on the home row and try to look at the screen instead of the keyboard.</textarea>
             </div>
-            
-            <div class="input-area">
-                <label>Your Input:</label>
-                <textarea id="student-input" placeholder="Start typing here..." spellcheck="false"></textarea>
+
+            <button class="btn" onclick="goToGame()">Start Competition</button>
+
+            <div style="text-align: center; margin-top: 15px;">
+                <a href="window.location.href = window.location.href" onclick="clearLeaderboard()"
+                    style="color: #999; font-size: 0.8rem;">Clear Leaderboard History</a>
             </div>
         </div>
 
-        <button class="btn btn-danger" onclick="finishGame()">Submit / Finish</button>
+        <!-- 2. Game Screen -->
+        <div id="game-screen" class="screen">
+            <div class="game-header">
+                <div style="font-weight: bold; font-size: 1.2rem;" id="current-player-name">Player: ---</div>
+
+                <!-- Feature 1: Real-time Stats -->
+                <div class="live-stats">
+                    <div class="live-stat-item">
+                        <div class="live-stat-value" id="live-speed">0</div>
+                        <div class="live-stat-label">WPM</div>
+                    </div>
+                    <div class="live-stat-item">
+                        <div class="live-stat-value" id="live-accuracy">100%</div>
+                        <div class="live-stat-label">Accuracy</div>
+                    </div>
+                </div>
+
+                <div class="timer-box" id="timer-display">00:00</div>
+            </div>
+
+            <div class="text-display-area">
+                <div>
+                    <label>Reference Text:</label>
+                    <div class="reference-text" id="game-reference-text"></div>
+                </div>
+
+                <div class="input-area">
+                    <label>Your Input:</label>
+                    <textarea id="student-input" placeholder="Start typing here..." spellcheck="false"></textarea>
+                </div>
+            </div>
+
+            <button class="btn btn-danger" onclick="finishGame()">Submit / Finish</button>
+        </div>
+
+        <!-- 3. Result Screen -->
+        <div id="result-screen" class="screen">
+            <h1>📊📊 Competition Results</h1>
+
+            <!-- Feature 2: Final Score Calculation -->
+            <div class="final-score-box">
+                <div style="font-size: 1.2rem; opacity: 0.9;">Total Score</div>
+                <div class="final-score-value" id="final-score">0</div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="res-name">---</div>
+                    <div class="stat-label">Name</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="res-speed">0</div>
+                    <div class="stat-label">Speed (WPM)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="res-accuracy">0%</div>
+                    <div class="stat-label">Accuracy</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="res-count">0</div>
+                    <div class="stat-label">Correct Chars</div>
+                </div>
+            </div>
+
+            <!-- Feature 3: Leaderboard -->
+            <div class="leaderboard-section">
+                <h2>🏆🏆 Leaderboard (Top 10)</h2>
+                <table id="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Name</th>
+                            <th>Score</th>
+                            <th>WPM</th>
+                            <th>Accuracy</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="rank-1">#1</td>
+                            <td style="font-weight:bold;">123 </td>
+                            <td style="font-weight:bold; color:#2c3e50;">99999</td>
+                            <td>999999</td>
+                            <td>99999%</td>
+                            <td style="font-size:0.8rem; color:#999;">2025-12-03 11:34:26</td>
+                        </tr>
+
+                        <tr>
+                            <td class="rank-2">#2</td>
+                            <td style="font-weight:bold;">3302 </td>
+                            <td style="font-weight:bold; color:#2c3e50;">440</td>
+                            <td>44</td>
+                            <td>100%</td>
+                            <td style="font-size:0.8rem; color:#999;">2025-12-03 11:11:11</td>
+                        </tr>
+
+                        <tr>
+                            <td class="rank-3">#3</td>
+                            <td style="font-weight:bold;">CHENG WING LAM </td>
+                            <td style="font-weight:bold; color:#2c3e50;">317</td>
+                            <td>32</td>
+                            <td>99%</td>
+                            <td style="font-size:0.8rem; color:#999;">2025-12-03 11:30:26</td>
+                        </tr>
+
+                        <tr>
+                            <td class="">#4</td>
+                            <td style="font-weight:bold;">3316 </td>
+                            <td style="font-weight:bold; color:#2c3e50;">300</td>
+                            <td>30</td>
+                            <td>100%</td>
+                            <td style="font-size:0.8rem; color:#999;">2025-12-03 11:23:27</td>
+                        </tr>
+
+                        <tr>
+                            <td class="">#5</td>
+                            <td style="font-weight:bold;">3329 </td>
+                            <td style="font-weight:bold; color:#2c3e50;">300</td>
+                            <td>30</td>
+                            <td>100%</td>
+                            <td style="font-size:0.8rem; color:#999;">2025-12-03 11:25:39</td>
+                        </tr>
+
+                        <tr>
+                            <td class="">#6</td>
+                            <td style="font-weight:bold;">3329 </td>
+                            <td style="font-weight:bold; color:#2c3e50;">300</td>
+                            <td>30</td>
+                            <td>100%</td>
+                            <td style="font-size:0.8rem; color:#999;">2025-12-03 11:28:23</td>
+                        </tr>
+
+                        <tr>
+                            <td class="">#7</td>
+                            <td style="font-weight:bold;">3315 </td>
+                            <td style="font-weight:bold; color:#2c3e50;">300</td>
+                            <td>30</td>
+                            <td>100%</td>
+                            <td style="font-size:0.8rem; color:#999;">2025-12-03 11:29:55</td>
+                        </tr>
+
+                        <tr>
+                            <td class="">#8</td>
+                            <td style="font-weight:bold;">3329 </td>
+                            <td style="font-weight:bold; color:#2c3e50;">297</td>
+                            <td>30</td>
+                            <td>99%</td>
+                            <td style="font-size:0.8rem; color:#999;">2025-12-03 11:27:04</td>
+                        </tr>
+
+                        <tr>
+                            <td class="">#9</td>
+                            <td style="font-weight:bold;">3316 </td>
+                            <td style="font-weight:bold; color:#2c3e50;">290</td>
+                            <td>29</td>
+                            <td>100%</td>
+                            <td style="font-size:0.8rem; color:#999;">2025-12-03 11:17:51</td>
+                        </tr>
+
+                        <tr>
+                            <td class="">#10</td>
+                            <td style="font-weight:bold;">3315 </td>
+                            <td style="font-weight:bold; color:#2c3e50;">290</td>
+                            <td>29</td>
+                            <td>100%</td>
+                            <td style="font-size:0.8rem; color:#999;">2025-12-03 11:19:04</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 在结果屏幕的按钮区域添加 -->
+            <div class="row" style="margin-top: 30px;">
+                <button class="btn btn-secondary" onclick="resetGame()">Next Student</button>
+                <button class="btn" onclick="refreshLeaderboard()" style="background-color: #27ae60;">Refresh
+                    Leaderboard</button>
+            </div>
+        </div>
     </div>
+</body>
 
-    <!-- 3. Result Screen -->
-    <div id="result-screen" class="screen">
-        <h1>📊📊 Competition Results</h1>
-        
-        <!-- Feature 2: Final Score Calculation -->
-        <div class="final-score-box">
-            <div style="font-size: 1.2rem; opacity: 0.9;">Total Score</div>
-            <div class="final-score-value" id="final-score">0</div>
-        </div>
-        
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-value" id="res-name">---</div>
-                <div class="stat-label">Name</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="res-speed">0</div>
-                <div class="stat-label">Speed (WPM)</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="res-accuracy">0%</div>
-                <div class="stat-label">Accuracy</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="res-count">0</div>
-                <div class="stat-label">Correct Chars</div>
-            </div>
-        </div>
-
-        <!-- Feature 3: Leaderboard -->
-        <div class="leaderboard-section">
-            <h2>🏆🏆 Leaderboard (Top 10)</h2>
-            <table id="leaderboard-table">
-                <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Name</th>
-                        <th>Score</th>
-                        <th>WPM</th>
-                        <th>Accuracy</th>
-                        <th>Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td class="rank-1">#1</td>
-                    <td style="font-weight:bold;">123 </td>
-                    <td style="font-weight:bold; color:#2c3e50;">99999</td>
-                    <td>999999</td>
-                    <td>99999%</td>
-                    <td style="font-size:0.8rem; color:#999;">2025-12-03 11:34:26</td>
-                </tr>
-            
-                <tr>
-                    <td class="rank-2">#2</td>
-                    <td style="font-weight:bold;">3302 </td>
-                    <td style="font-weight:bold; color:#2c3e50;">440</td>
-                    <td>44</td>
-                    <td>100%</td>
-                    <td style="font-size:0.8rem; color:#999;">2025-12-03 11:11:11</td>
-                </tr>
-            
-                <tr>
-                    <td class="rank-3">#3</td>
-                    <td style="font-weight:bold;">CHENG WING LAM </td>
-                    <td style="font-weight:bold; color:#2c3e50;">317</td>
-                    <td>32</td>
-                    <td>99%</td>
-                    <td style="font-size:0.8rem; color:#999;">2025-12-03 11:30:26</td>
-                </tr>
-            
-                <tr>
-                    <td class="">#4</td>
-                    <td style="font-weight:bold;">3316 </td>
-                    <td style="font-weight:bold; color:#2c3e50;">300</td>
-                    <td>30</td>
-                    <td>100%</td>
-                    <td style="font-size:0.8rem; color:#999;">2025-12-03 11:23:27</td>
-                </tr>
-            
-                <tr>
-                    <td class="">#5</td>
-                    <td style="font-weight:bold;">3329 </td>
-                    <td style="font-weight:bold; color:#2c3e50;">300</td>
-                    <td>30</td>
-                    <td>100%</td>
-                    <td style="font-size:0.8rem; color:#999;">2025-12-03 11:25:39</td>
-                </tr>
-            
-                <tr>
-                    <td class="">#6</td>
-                    <td style="font-weight:bold;">3329 </td>
-                    <td style="font-weight:bold; color:#2c3e50;">300</td>
-                    <td>30</td>
-                    <td>100%</td>
-                    <td style="font-size:0.8rem; color:#999;">2025-12-03 11:28:23</td>
-                </tr>
-            
-                <tr>
-                    <td class="">#7</td>
-                    <td style="font-weight:bold;">3315 </td>
-                    <td style="font-weight:bold; color:#2c3e50;">300</td>
-                    <td>30</td>
-                    <td>100%</td>
-                    <td style="font-size:0.8rem; color:#999;">2025-12-03 11:29:55</td>
-                </tr>
-            
-                <tr>
-                    <td class="">#8</td>
-                    <td style="font-weight:bold;">3329 </td>
-                    <td style="font-weight:bold; color:#2c3e50;">297</td>
-                    <td>30</td>
-                    <td>99%</td>
-                    <td style="font-size:0.8rem; color:#999;">2025-12-03 11:27:04</td>
-                </tr>
-            
-                <tr>
-                    <td class="">#9</td>
-                    <td style="font-weight:bold;">3316 </td>
-                    <td style="font-weight:bold; color:#2c3e50;">290</td>
-                    <td>29</td>
-                    <td>100%</td>
-                    <td style="font-size:0.8rem; color:#999;">2025-12-03 11:17:51</td>
-                </tr>
-            
-                <tr>
-                    <td class="">#10</td>
-                    <td style="font-weight:bold;">3315 </td>
-                    <td style="font-weight:bold; color:#2c3e50;">290</td>
-                    <td>29</td>
-                    <td>100%</td>
-                    <td style="font-size:0.8rem; color:#999;">2025-12-03 11:19:04</td>
-                </tr>
-            </tbody>
-            </table>
-        </div>
-
-        <!-- 在结果屏幕的按钮区域添加 -->
-        <div class="row" style="margin-top: 30px;">
-            <button class="btn btn-secondary" onclick="resetGame()">Next Student</button>
-            <button class="btn" onclick="refreshLeaderboard()" style="background-color: #27ae60;">Refresh Leaderboard</button>
-        </div>
-    </div>
-</div>
-
-<script>
-// 全局變數
-let targetText = "";
-let timeLimitSeconds = 180;
-let timerInterval;
-let remainingTime = 0;
-let isPlaying = false;
-let currentSessionId = null; // 新增：用於驗證身分
-let keystrokes = []; // 新增：用於記錄擊鍵時間
-let lastKeyTime = 0;
-
-// DOM 元素引用 (保持原樣)
-const setupScreen = document.getElementById('setup-screen');
-const gameScreen = document.getElementById('game-screen');
-const resultScreen = document.getElementById('result-screen');
-const articleInput = document.getElementById('article-input');
-const timeInput = document.getElementById('time-limit');
-const nameInput = document.getElementById('student-name');
-const gameRefText = document.getElementById('game-reference-text');
-const studentInput = document.getElementById('student-input');
-const timerDisplay = document.getElementById('timer-display');
-const liveSpeedEl = document.getElementById('live-speed');
-const liveAccEl = document.getElementById('live-accuracy');
-const currentPlayerDisplay = document.getElementById('current-player-name');
-
-// 監聽器
-studentInput.addEventListener('input', (e) => {
-    // 記錄擊鍵時間 (反作弊數據)
-    const now = Date.now();
-    keystrokes.push(now);
-    
-    updateRealTimeFeedback();
-    // 前端只做視覺上的即時計算，不做最終定奪
-    updateLiveStatsUI(); 
-});
-
-// 嚴格禁止貼上與拖放
-studentInput.addEventListener('paste', (e) => { e.preventDefault(); alert("不可以!!"); });
-studentInput.addEventListener('drop', (e) => { e.preventDefault(); alert("給我放下!!"); });
-
-// 1. 開始遊戲 (請求伺服器分配 Session)
-async function goToGame() {
-    const playerName = nameInput.value.trim();
-    targetText = articleInput.value.trim();
-
-    if (!playerName) return alert("Please enter name!");
-    
-    try {
-        // 向後端請求開始，獲取 Session ID
-        const response = await fetch('/api/start', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ targetText: targetText })
-        });
-        const data = await response.json();
-        currentSessionId = data.sessionId;
-
-        // 初始化遊戲狀態
-        timeLimitSeconds = parseInt(timeInput.value) * 60;
-        remainingTime = timeLimitSeconds;
-        studentInput.value = "";
-        studentInput.disabled = false;
-        keystrokes = []; // 重置擊鍵數據
-        
-        currentPlayerDisplay.innerText = `Player: ${playerName}`;
-        showScreen('game-screen');
-        updateRealTimeFeedback();
-        
-        startTimer();
-        setTimeout(() => studentInput.focus(), 100);
-
-    } catch (err) {
-        alert("Server connection failed. Please check if Node.js is running.");
-        console.error(err);
-    }
-}
-
-// 2. 結束遊戲 (提交數據給伺服器驗證)
-async function finishGame() {
-    clearInterval(timerInterval);
-    isPlaying = false;
-    studentInput.disabled = true;
-
-    const playerName = nameInput.value.trim();
-    const typedContent = studentInput.value;
-
-    try {
-        const response = await fetch('/api/submit', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                sessionId: currentSessionId,
-                playerName: playerName,
-                typedText: typedContent,
-                keystrokeData: keystrokes // 傳送擊鍵特徵供分析
-            })
-        });
-
-        const result = await response.json();
-
-        if (result.isCheating) {
-            alert(`CHEAT DETECTED: ${result.reason}`);
-            // 顯示作弊懲罰畫面
-            document.getElementById('final-score').innerText = "CHEATER";
-            document.getElementById('final-score').style.color = "red";
-        } else if (result.success) {
-            // 使用伺服器計算的權威數據
-            const rec = result.record;
-            document.getElementById('final-score').innerText = rec.score;
-            document.getElementById('res-speed').innerText = rec.wpm;
-            document.getElementById('res-accuracy').innerText = rec.accuracy + "%";
-            document.getElementById('res-count').innerText = rec.correct_chars;
-            document.getElementById('res-name').innerText = rec.name;
-        }
-
-        showScreen('result-screen');
-        loadLeaderboard(); // 刷新排行榜
-
-    } catch (err) {
-        console.error("Submission failed", err);
-        alert("伺服器繁忙~我正在維修:3");
-    }
-}
-
-// 3. 載入排行榜
-async function loadLeaderboard() {
-    try {
-        const res = await fetch('/api/leaderboard');
-        const scores = await res.json();
-        renderLeaderboard(scores);
-    } catch (err) {
-        console.error("Failed to load leaderboard");
-    }
-}
-
-// 渲染排行榜 (保留您原本的樣式)
-function renderLeaderboard(history) {
-    const tbody = document.querySelector('#leaderboard-table tbody');
-    tbody.innerHTML = "";
-    
-    history.forEach((rec, index) => {
-        const rank = index + 1;
-        let rankClass = rank === 1 ? "rank-1" : (rank === 2 ? "rank-2" : (rank === 3 ? "rank-3" : ""));
-        
-        // 簡單的 HTML 構造，您原本的 CSS 會自動套用
-        const row = `
-            <tr>
-                <td class="${rankClass}">#${rank}</td>
-                <td style="font-weight:bold;">${rec.name}</td>
-                <td style="font-weight:bold; color:#2c3e50;">${rec.score}</td>
-                <td>${rec.wpm}</td>
-                <td>${rec.accuracy}%</td>
-                <td style="font-size:0.8rem; color:#999;">${rec.date}</td>
-            </tr>
-        `;
-        tbody.innerHTML += row;
-    });
-}
-
-// 輔助功能：UI 切換
-function showScreen(id) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-}
-
-function startTimer() {
-    isPlaying = true;
-    timerInterval = setInterval(() => {
-        remainingTime--;
-        updateTimerDisplay();
-        if (remainingTime <= 0) finishGame();
-    }, 1000);
-}
-
-function updateTimerDisplay() {
-    const m = Math.floor(remainingTime / 60).toString().padStart(2, '0');
-    const s = (remainingTime % 60).toString().padStart(2, '0');
-    timerDisplay.innerText = `${m}:${s}`;
-}
-
-// 簡單的前端視覺反饋 (不做數據權威)
-function updateRealTimeFeedback() {
-    const typed = studentInput.value;
-    let html = "";
-    for (let i = 0; i < targetText.length; i++) {
-        const targetChar = targetText[i];
-        const typedChar = typed[i];
-        if (typedChar === undefined) {
-            html += (i === typed.length) ? `<span class="hl-current">${targetChar}</span>` : `<span>${targetChar}</span>`;
-        } else {
-            html += (typedChar === targetChar) ? `<span class="hl-correct">${targetChar}</span>` : `<span class="hl-wrong">${targetChar}</span>`;
-        }
-    }
-    gameRefText.innerHTML = html;
-    
-    // 自動捲動
-    const currentSpan = gameRefText.querySelector('.hl-current');
-    if (currentSpan) currentSpan.scrollIntoView({ behavior: "smooth", block: "center" });
-}
-
-function updateLiveStatsUI() {
-    // 這裡僅作視覺參考，不影響最終成績
-    const typed = studentInput.value;
-    const words = typed.length / 5;
-    const mins = (timeLimitSeconds - remainingTime) / 60;
-    const wpm = mins > 0 ? Math.round(words / mins) : 0;
-    liveSpeedEl.innerText = wpm;
-}
-
-function resetGame() {
-    nameInput.value = "";
-    showScreen('setup-screen');
-}
-
-function refreshLeaderboard() {
-    loadLeaderboard();
-}
-
-// 初始加載
-loadLeaderboard();
-</script>
-
-
-
-</body></html>
-
+</html>
